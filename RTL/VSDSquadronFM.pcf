@@ -1,0 +1,5 @@
+# Reset
+set_io RESET 10
+
+# Timer Interrupt
+set_io timer_interrupt 39
