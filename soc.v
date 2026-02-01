@@ -1,8 +1,7 @@
 `timescale 1ns / 1ps
 
-module soc_top (
-    input clk,
-    input rst, // Active High (matches RiscV.v)
+module soc (
+    input RESET, // Active High (matches RiscV.v)
     output timer_interrupt
 );
 
@@ -15,14 +14,35 @@ module soc_top (
     wire [2:0]  funct3;
     
     // Reset inversion for Peripherals (usually Active Low)
-    wire rst_n = ~rst; 
+    wire rst_n; 
+    wire clk_int;
+    wire clk;
+
+    // ---------------------------------
+    // 12 MHz clock
+    // ---------------------------------
+    SB_HFOSC hfosc (
+       .CLKHFPU(1'b1),
+       .CLKHFEN(1'b1),
+       .CLKHF(clk_int)
+    );
+
+    // -------------------------------------
+    // Gearbox and reset circuitry
+    // -------------------------------------
+    Clockworks CW(
+      .CLK(clk_int),
+      .RESET(RESET),
+      .clk(clk),
+      .resetn(rst_n)
+    );
 
     // ---------------------------------------------------------
     // 1. RISC-V Core (Modified to support Stall & Ext Memory)
     // ---------------------------------------------------------
     RiscV core (
         .clk(clk),
-        .rst(rst),
+        .rst(~rst_n),
         .Ext_MemWrite(1'b0), // Tied low for normal operation
         .Ext_WriteData(32'b0),
         .Ext_DataAdr(32'b0),
@@ -55,7 +75,7 @@ module soc_top (
     wire [31:0] p_addr, p_wdata, p_rdata;
 
     apb_master bridge (
-        .clk(clk), .rst(rst),
+        .clk(clk), .rst(~rst_n),
         .rv_addr(DataAdr),
         .rv_wdata(WriteData),
         .rv_mem_write(MemWrite),
