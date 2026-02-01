@@ -13,7 +13,7 @@ reg [31:0] reg_file [31:0];
 
 integer i;
 
-always @(posedge clk) begin
+always @(posedge clk or posedge rst) begin
     if (rst)
         for (i = 0; i < 32; i = i + 1) begin
             reg_file [i] <= 0;

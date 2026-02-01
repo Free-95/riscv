@@ -4,6 +4,7 @@ module Fetch(
     input         clk,
     input         rst,
     input         pcsrc,
+    input         stall,
     input  [31:0] pctarget,
     output [31:0] pcplus4,
     output [31:0] instr,
@@ -16,7 +17,8 @@ module Fetch(
     .pcsrc(pcsrc),
     .pctarget(pctarget),
     .pcplus4(pcplus4),
-    .pc(pc)
+    .pc(pc),
+    .stall(stall)
     );
     
     instr_mem IM(

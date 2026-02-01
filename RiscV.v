@@ -5,8 +5,11 @@ module RiscV(
     input         Ext_MemWrite,
     input  [31:0] Ext_WriteData, Ext_DataAdr,
     output        MemWrite,
-    output [31:0] WriteData, DataAdr, ReadData,
-    output [31:0] PC, Result
+    output [31:0] WriteData, DataAdr,
+    input         Stall,
+    input  [31:0] ReadData,
+    output [1:0]  ResultSrcOut,
+    output [2:0]  funct3
     );
     
     wire [31:0] pctarget,pcplus4,instr,pc,RD1,RD2,immext,aluresult,readdata,result;
@@ -14,13 +17,13 @@ module RiscV(
     wire [1:0]  resultsrc,alusrc;
     wire [3:0]  alucontrol;
     
-    assign PC = pc;
-    assign Result = result;
     assign ReadData = readdata;
     assign MemWrite  = (Ext_MemWrite && rst) ? 1 : WEM;
     assign WriteData = (Ext_MemWrite && rst) ? Ext_WriteData : RD2;
     assign DataAdr   = rst ? Ext_DataAdr : aluresult;
-    
+    assign ResultSrcOut = resultsrc;
+    assign funct3 = instr[14:12];
+
     Fetch F1 (
     .clk(clk),
     .rst(rst),
@@ -28,7 +31,8 @@ module RiscV(
     .pctarget(pctarget),
     .pcplus4(pcplus4),
     .instr(instr),
-    .pc(pc)
+    .pc(pc),
+    .stall(Stall)
     );
     
     Decode D1(
@@ -62,15 +66,6 @@ module RiscV(
     .pctarget(pctarget),
     .aluresult(aluresult),
     .pcsrc(pcsrc)
-    );
-    
-    data_mem DM1(
-    .clk(clk),
-    .WE(MemWrite),
-    .funct3(instr[14:12]),
-    .A(DataAdr),
-    .WD(WriteData),
-    .RD(readdata)
     );
     
     mux4 M1(

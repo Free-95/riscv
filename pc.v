@@ -3,6 +3,7 @@
 module pc (
     input         clk,
     input         rst,
+    input         stall,
     input         pcsrc,
     input  [31:0] pctarget,
     output [31:0] pcplus4,
@@ -11,12 +12,12 @@ module pc (
     
     wire [31:0] pcnext;
     
-    always @(posedge clk) begin
+    always @(posedge clk or posedge rst) begin
     if (rst) 
         begin
             pc <= 32'b0;
         end
-        else 
+    else if (!stall)
         begin
             pc <= pcnext ;
         end
