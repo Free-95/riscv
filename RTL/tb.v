@@ -10,8 +10,8 @@ module testbench;
     );
 
     initial begin
-        //$dumpfile("test.vcd");
-        //$dumpvars(0, testbench);
+        $dumpfile("test.vcd");
+        $dumpvars(0, testbench);
 
         // Init
         RESET = 0;
@@ -20,7 +20,7 @@ module testbench;
         #100 RESET = 1;
         #100 RESET = 0; 
 
-        #100000000000;
+        #1000000000;
         $finish;
     end
 endmodule

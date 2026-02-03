@@ -40,9 +40,7 @@ int main() {
     TIMER_CTRL = CTRL_ENABLE; 
 
     // 3. Poll the Status Register waiting for the Timeout flag
-    while ((TIMER_STATUS & STATUS_TIMEOUT) == 0) {
-        // Busy wait until timer hits 0
-    }
+    while ((TIMER_STATUS & STATUS_TIMEOUT) == 0);
     printf("Timeout");
 
     // 4. Verification: In One-Shot mode, the timer should auto-disable.
